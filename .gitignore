@@ -1,0 +1,6 @@
+.vscode/
+
+build/
+cmake_installs.cmake
+
+build.ninja
