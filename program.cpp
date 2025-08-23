@@ -46,6 +46,7 @@ void Program::run() {
     while(isRunning) {
         SDL_Event e;
         SDL_PollEvent(&e);
+        SDL_Log("");
         this->update(e);
         this->render();
     }

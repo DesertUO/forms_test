@@ -1,6 +1,8 @@
 .vscode/
+.cache/
 
 build/
 cmake_installs.cmake
+compile_commands.json
 
 build.ninja

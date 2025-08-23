@@ -58,8 +58,13 @@ struct ButtonComponent : UIComponent{
         SDL_Log("ASd");
     }
     virtual void onRightRelease() {}
-    virtual void onHover() {};
+    virtual void onHover() {
+        SDL_Log("Hovered...");
+    };
     virtual void onFocus() {};
+    virtual void whileFocus() {
+        SDL_Log("On focus...%s", text.c_str());
+    };
     virtual void onLostFocus() {};
 };
 
@@ -72,6 +77,7 @@ class UIFrame {
         Vec2<float>                 mousePos;
         vector<UIComponent*>        components;
         vector<ButtonComponent*>    buttons;
+        vector<UIComponent*> inFocus;
     public:
         Vec2<int>                   winSize;
 

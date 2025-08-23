@@ -26,6 +26,18 @@ inline int UIFrame::posToGrid(Vec2<float> pos) {
 
 void UIFrame::update(const SDL_Event& e) {
     SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
+    if(!inFocus.empty()) {
+        static_cast<ButtonComponent*>(inFocus.at(0))->whileFocus();
+    }
+
+    for(auto button = buttons.rbegin(); button != buttons.rend(); ++button) {
+        if(PointInFRect(&(*button)->boundingBox, mousePos)) {
+            (*button)->onHover();
+            break;
+        }
+    }
+
     if(e.type == SDL_EVENT_MOUSE_MOTION) {
         float xrel = e.motion.xrel;
         float yrel = e.motion.yrel;
@@ -38,8 +50,20 @@ void UIFrame::update(const SDL_Event& e) {
     if(e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         float bX = e.button.x;
         float bY = e.button.y;
+        bool buttonClicked = false;
         for(auto button = buttons.rbegin(); button != buttons.rend(); ++button) {
             if(PointInFRect(&(*button)->boundingBox, Vec2<float>{bX, bY})) {
+                buttonClicked = true;
+                if(inFocus.empty()) {
+                    inFocus.emplace_back(*button);
+                }
+                else {
+                    if(*button != inFocus.at(0)) {
+                        inFocus.pop_back();
+                        inFocus.emplace_back(*button);
+                        (*button)->onFocus();
+                    }
+                }
                 if(e.button.button == LEFT_CLICK) {
                     (*button)->hasBeenClicked = true;
                     (*button)->onClick();
@@ -49,8 +73,10 @@ void UIFrame::update(const SDL_Event& e) {
                     (*button)->onRightClick();
                     break;
                 }
+                break;
             }
         }
+        if(!buttonClicked && !inFocus.empty()) { inFocus.pop_back(); }
     }
     if(e.type == SDL_EVENT_MOUSE_BUTTON_UP) {
         for(auto& button : buttons) {
