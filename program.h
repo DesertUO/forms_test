@@ -5,6 +5,10 @@
 #include <cmath>
 #include "utils.h"
 
+// This is a macro, do you see it? lol
+// This is an fucking actual macro boi
+#define getColor(color) color.r, color.g, color.b,  color.a
+
 class Program {
     private:
         SDL_Window*                 _window;
@@ -12,6 +16,7 @@ class Program {
         bool                        isRunning;
         double                      counter;
         UIFrame*                    uiFrame;
+
     public:
         Program();
         ~Program();

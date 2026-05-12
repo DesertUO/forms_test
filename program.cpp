@@ -31,22 +31,24 @@ void Program::run() {
     isRunning = true;
     counter = 0;
 
+    UIFrameComponent* bg_comp = new UIFrameComponent();
+    bg_comp->boundingBox = SDL_FRect{0, 0, 1000, 1000};
+    bg_comp->bg = SDL_Color{10, 10, 10, SDL_ALPHA_OPAQUE};
+
     // Test buttons
     ButtonComponent* b1 = new ButtonComponent();
     b1->text = "ASd";
     b1->boundingBox = SDL_FRect{ 200.0f, 100.0f, 100.0f, 100.0f};
-    b1->bg = SDL_Color{200, 100, 50, SDL_ALPHA_OPAQUE};
-    uiFrame->addButton(b1);
+    uiFrame->addComponent(b1);
 
     ButtonComponent* b2 = new ButtonComponent();
     b2->text = "Testt";
     b2->boundingBox = SDL_FRect{ 250.0f, 150.0f, 100.0f, 100.0f};
-    b2->bg = SDL_Color{100, 200, 50, SDL_ALPHA_OPAQUE};
-    uiFrame->addButton(b2);
+    uiFrame->addComponent(b2);
+
     while(isRunning) {
         SDL_Event e;
         SDL_PollEvent(&e);
-        SDL_Log("");
         this->update(e);
         this->render();
     }

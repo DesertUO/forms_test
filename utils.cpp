@@ -14,18 +14,38 @@ UIFrame::UIFrame() {
 UIFrame::~UIFrame() {
 }
 
-void UIFrame::addButton(ButtonComponent* button) {
-    this->buttons.emplace_back(button);
+void UIFrame::addComponent(UIComponent* component) {
+    components.emplace_back(component);
+    ButtonComponent* button = static_cast<ButtonComponent*>(component);
+    if(button) {
+       buttons.emplace_back(button);
+    }
+}
+
+inline int coordToIndex(const int& x, const int& y, const int& width, const int& height) {
+    if(x > width || y > height) {
+        SDL_Log("Warning: Cordinates given are out of range of matrix");
+    }
+    return y * width + x;
 }
 
 // TODO
-inline int UIFrame::posToGrid(Vec2<float> pos) {
-    return 1;
+inline int UIFrame::posToGrid(const Vec2<float>& pos) {
+    int x = (int) pos.x / gridSize;
+    int y = (int) pos.y / gridSize;
+    return coordToIndex(x, y, gridDim.x, gridDim.y);
 }
 
 
+void UIFrame::updateGridDims() {
+    gridDim.x = (int) winSize.x / gridSize + 1;
+    gridDim.y = (int) winSize.y / gridSize + 1;
+}
+
 void UIFrame::update(const SDL_Event& e) {
     SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
+    updateGridDims();
 
     if(!inFocus.empty()) {
         static_cast<ButtonComponent*>(inFocus.at(0))->whileFocus();
@@ -43,6 +63,8 @@ void UIFrame::update(const SDL_Event& e) {
         float yrel = e.motion.yrel;
         for(auto& button : buttons) {
             if(!button->hasBeenClicked) { continue; }
+            // Enable just for draggable objects
+            continue;
             button->boundingBox.x += xrel;
             button->boundingBox.y += yrel;
         }
@@ -88,7 +110,23 @@ void UIFrame::update(const SDL_Event& e) {
     }
 }
 
+void UIFrame::renderGrid(SDL_Renderer* _renderer) {
+    SDL_Color prevColor;
+    SDL_GetRenderDrawColor(_renderer, &prevColor.r, &prevColor.g, &prevColor.b, &prevColor.a);
+    SDL_SetRenderDrawColor(_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    // Horizontal
+    for(int i = 1; i < gridDim.x; i++) {
+        SDL_RenderLine(_renderer, i*gridSize, 0, i*gridSize, winSize.y);
+    }
+    // Vertial
+    for(int i = 1; i < gridDim.y; i++) {
+        SDL_RenderLine(_renderer, 0, i*gridSize, winSize.x, i*gridSize);
+    }
+    SDL_SetRenderDrawColor(_renderer, prevColor.r, prevColor.g, prevColor.b, prevColor.a);
+}
+
 void UIFrame::render(SDL_Renderer* _renderer) {
+    renderGrid(_renderer);
     for(auto& button: buttons) {
         SDL_SetRenderDrawColor(_renderer, button->bg.r, button->bg.g, button->bg.b, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(_renderer, &button->boundingBox);

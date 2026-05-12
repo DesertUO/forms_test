@@ -9,6 +9,9 @@ using std::vector;
 using std::unordered_map;
 
 template < typename T >
+using matrix = vector<vector<T>>;
+
+template < typename T >
 struct Vec2 {
     T                               x;
     T                               y;
@@ -27,7 +30,16 @@ struct Rec2 {
 #define AUX_1_CLICK                 4
 #define AUX_2_CLICK                 5
 
+enum UIComponentState {
+    NORMAL,
+    LEFT_CLICKED,
+    RIGHT_CLICKED,
+    HOVERED,
+    FOCUSED
+};
+
 struct UIComponent {
+    UIComponentState                state = NORMAL;
 };
 
 struct UIFrameComponent : UIComponent {
@@ -36,19 +48,37 @@ struct UIFrameComponent : UIComponent {
     vector<UIComponent*>            children;
 };
 
-struct ButtonComponent : UIComponent{
+/*
+enum UIButtonState {
+    NORMAL,
+    LEFT_CLICKED,
+    RIGHT_CLICKED,
+    HOVERED,
+    FOCUSED
+};
+*/
+
+struct FrameComponent : UIComponent {
+    SDL_Color                       bg;
+    string                          path_to_bg;
+    bool                            image_bg;
+};
+
+struct ButtonComponent : UIComponent {
+    UIComponentState                state = NORMAL;
     string                          text;
     string                          prevText;
+    string                          content;
     SDL_FRect                       boundingBox;
-    SDL_Color                       bg;
+    SDL_Color                       bg             = SDL_Color{100, 100, 100, SDL_ALPHA_OPAQUE};
     SDL_Color                       prevBg;
     bool                            hasBeenClicked = false;
 
     virtual void onClick() {
-        prevText = text;
+        content = text;
         text = "Button clicked!";
         prevBg = bg;
-        bg = SDL_Color{100, 100, 100, SDL_ALPHA_OPAQUE};
+        bg = SDL_Color{50, 50, 50, SDL_ALPHA_OPAQUE};
     };
     virtual void onRelease() {
         text = prevText;
@@ -59,7 +89,7 @@ struct ButtonComponent : UIComponent{
     }
     virtual void onRightRelease() {}
     virtual void onHover() {
-        SDL_Log("Hovered...");
+        SDL_Log("Hovered... %s", text.c_str());
     };
     virtual void onFocus() {};
     virtual void whileFocus() {
@@ -77,19 +107,25 @@ class UIFrame {
         Vec2<float>                 mousePos;
         vector<UIComponent*>        components;
         vector<ButtonComponent*>    buttons;
-        vector<UIComponent*> inFocus;
+        vector<UIComponent*>        inFocus;
+        Vec2<int>                   gridDim;
+        float                       gridSize = 500.0f;
+        matrix<ButtonComponent*>    grid;
     public:
         Vec2<int>                   winSize;
 
         UIFrame();
         ~UIFrame();
 
-        void addButton(ButtonComponent* button);
+        void addComponent(UIComponent* component);
 
         void update(const SDL_Event& e);
         void render(SDL_Renderer* _renderer);
 
-        int posToGrid(Vec2<float> pos);
+        void renderGrid(SDL_Renderer* _renderer);
+
+        void updateGridDims();
+        int posToGrid(const Vec2<float>& pos);
 };
 
 
