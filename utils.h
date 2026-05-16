@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <variant>
 
 using std::string;
 using std::vector;
@@ -24,6 +25,16 @@ struct Rec2 {
     double                          h;
 };
 
+struct Color {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+};
+
+using uint8 = unsigned char;
+
+struct Event {};
+
 #define LEFT_CLICK                  1
 #define MIDDLE_CLICK                2
 #define RIGHT_CLICK                 3
@@ -38,25 +49,35 @@ enum UIComponentState {
     FOCUSED
 };
 
-struct UIComponent {
-    UIComponentState                state = NORMAL;
+class UIComponent {
+    public:
+        Rec2                            bounds;
+        UIComponentState                state = NORMAL;
+        UIComponent*                    parent;
+        vector<UIComponent*>            children;
+
+        virtual void layout() = 0;
+
+        virtual void handle_event(Event e) = 0;
+        
+        virtual void draw() = 0;
 };
+
+enum class UIStyleProperty {
+    BACKGROUND_COLOR,
+    BORDER_SIZE,
+    BORDER_COLOR,
+    TEXT_CONTENT,
+};
+
+using UIStylePrimitive = std::variant<float, int, uint8, string, Color>;
+
+using UIStyleBlock = unordered_map<UIStyleProperty, UIStylePrimitive>;
 
 struct UIFrameComponent : UIComponent {
     SDL_FRect                       boundingBox;
     SDL_Color                       bg;
-    vector<UIComponent*>            children;
 };
-
-/*
-enum UIButtonState {
-    NORMAL,
-    LEFT_CLICKED,
-    RIGHT_CLICKED,
-    HOVERED,
-    FOCUSED
-};
-*/
 
 struct FrameComponent : UIComponent {
     SDL_Color                       bg;
