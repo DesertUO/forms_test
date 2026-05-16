@@ -148,5 +148,3 @@ class UIFrame {
         void updateGridDims();
         int posToGrid(const Vec2<float>& pos);
 };
-
-
