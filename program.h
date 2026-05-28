@@ -25,6 +25,8 @@ class Program {
         void run();
         void stop();
 
-        void update(const SDL_Event& event);
+        void update();
         void render();
+
+        void handleEvent(const SDL_Event& event);
 };

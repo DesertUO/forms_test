@@ -6,3 +6,5 @@ cmake_installs.cmake
 compile_commands.json
 
 build.ninja
+
+asd.cpp

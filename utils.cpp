@@ -1,11 +1,5 @@
 #include "utils.h"
 
-bool PointInFRect(const SDL_FRect* rect, Vec2<float> pos) {
-    return (pos.x >= rect->x &&
-            pos.x <= rect->x + rect->w &&
-            pos.y >= rect->y &&
-            pos.y <= rect->y + rect->h);
-}
 
 UIFrame::UIFrame() {
     this->buttons = {};
@@ -14,9 +8,13 @@ UIFrame::UIFrame() {
 UIFrame::~UIFrame() {
 }
 
+// TODO: To change, as it only allows button components, and rest of functionality
+// is based on that
+// Working/Thinking on what components to add, and what should each component
+// do. So... yeah
 void UIFrame::addComponent(UIComponent* component) {
     components.emplace_back(component);
-    ButtonComponent* button = static_cast<ButtonComponent*>(component);
+    UIButtonComponent* button = static_cast<UIButtonComponent*>(component);
     if(button) {
        buttons.emplace_back(button);
     }
@@ -42,13 +40,13 @@ void UIFrame::updateGridDims() {
     gridDim.y = (int) winSize.y / gridSize + 1;
 }
 
-void UIFrame::update(const SDL_Event& e) {
+void UIFrame::update() {
     SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
     updateGridDims();
 
     if(!inFocus.empty()) {
-        static_cast<ButtonComponent*>(inFocus.at(0))->whileFocus();
+        static_cast<UIButtonComponent*>(inFocus.at(0))->whileFocus();
     }
 
     for(auto button = buttons.rbegin(); button != buttons.rend(); ++button) {
@@ -58,6 +56,9 @@ void UIFrame::update(const SDL_Event& e) {
         }
     }
 
+}
+
+void UIFrame::handleEvent(const SDL_Event& e) {
     if(e.type == SDL_EVENT_MOUSE_MOTION) {
         float xrel = e.motion.xrel;
         float yrel = e.motion.yrel;
@@ -108,6 +109,7 @@ void UIFrame::update(const SDL_Event& e) {
             }
         }
     }
+
 }
 
 void UIFrame::renderGrid(SDL_Renderer* _renderer) {

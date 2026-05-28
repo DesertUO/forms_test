@@ -36,20 +36,23 @@ void Program::run() {
     bg_comp->bg = SDL_Color{10, 10, 10, SDL_ALPHA_OPAQUE};
 
     // Test buttons
-    ButtonComponent* b1 = new ButtonComponent();
+    UIButtonComponent* b1 = new UIButtonComponent();
     b1->text = "ASd";
     b1->boundingBox = SDL_FRect{ 200.0f, 100.0f, 100.0f, 100.0f};
     uiFrame->addComponent(b1);
 
-    ButtonComponent* b2 = new ButtonComponent();
+    UIButtonComponent* b2 = new UIButtonComponent();
     b2->text = "Testt";
     b2->boundingBox = SDL_FRect{ 250.0f, 150.0f, 100.0f, 100.0f};
     uiFrame->addComponent(b2);
 
     while(isRunning) {
         SDL_Event e;
-        SDL_PollEvent(&e);
-        this->update(e);
+        while(SDL_PollEvent(&e)) {
+            this->handleEvent(e);
+            uiFrame->handleEvent(e);
+        }
+        this->update();
         this->render();
     }
 }
@@ -58,14 +61,17 @@ void Program::stop() {
     this->isRunning = false;
 }
 
-void  Program::update(const SDL_Event& event) {
-    SDL_GetWindowSize(_window, &uiFrame->winSize.x, &uiFrame->winSize.y);
+void Program::handleEvent(const SDL_Event& event) {
     switch(event.type) {
         case SDL_EVENT_QUIT:
             this->stop();
             break;
     }
-    uiFrame->update(event);
+}
+
+void  Program::update() {
+    SDL_GetWindowSize(_window, &uiFrame->winSize.x, &uiFrame->winSize.y);
+    uiFrame->update();
 }
 
 void Program::render() {

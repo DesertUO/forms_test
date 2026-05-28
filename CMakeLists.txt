@@ -15,6 +15,8 @@ PRIVATE
     main.cpp
     program.h program.cpp
     utils.h utils.cpp
+    definitions_utils.h definitions_utils.cpp
+    components/components.h components/components.cpp
 )
 
 target_link_libraries(Forms_test SDL3::SDL3)
