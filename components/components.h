@@ -83,6 +83,7 @@ class UIButtonComponent : public UIComponent {
         virtual void onClick() {
             content = text;
             text = "Button clicked!";
+            prevText = content;
             prevBg = bg;
             bg = SDL_Color{50, 50, 50, SDL_ALPHA_OPAQUE};
         };

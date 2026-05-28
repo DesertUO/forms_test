@@ -31,9 +31,12 @@ void Program::run() {
     isRunning = true;
     counter = 0;
 
-    UIFrameComponent* bg_comp = new UIFrameComponent();
-    bg_comp->boundingBox = SDL_FRect{0, 0, 1000, 1000};
-    bg_comp->bg = SDL_Color{10, 10, 10, SDL_ALPHA_OPAQUE};
+    // Will not work for now
+    // UIFrameComponent* bg_comp = new UIFrameComponent();
+    // bg_comp->boundingBox = SDL_FRect{0, 0, 1000, 1000};
+    // bg_comp->bg = SDL_Color{10, 10, 10, SDL_ALPHA_OPAQUE};
+    // as it still needs implementation
+    // uiFrame->addComponent(bg_comp);
 
     // Test buttons
     UIButtonComponent* b1 = new UIButtonComponent();
@@ -47,6 +50,8 @@ void Program::run() {
     uiFrame->addComponent(b2);
 
     while(isRunning) {
+        SDL_Log("Tick: %d", ((counter % 20) + 1));
+
         SDL_Event e;
         while(SDL_PollEvent(&e)) {
             this->handleEvent(e);
@@ -54,6 +59,8 @@ void Program::run() {
         }
         this->update();
         this->render();
+        counter++;
+        SDL_Delay(50);
     }
 }
 

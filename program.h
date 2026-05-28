@@ -14,7 +14,7 @@ class Program {
         SDL_Window*                 _window;
         SDL_Renderer*               _renderer;
         bool                        isRunning;
-        double                      counter;
+        int                      counter;
         UIFrame*                    uiFrame;
 
     public:
