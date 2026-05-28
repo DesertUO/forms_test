@@ -71,7 +71,6 @@ class UIButtonComponent : public UIComponent {
     public:
         UIButtonComponent();
 
-        UIComponentState                state = NORMAL;
         string                          text;
         string                          prevText;
         string                          content;
