@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include <memory>
 #include "../definitions_utils.h"
 
 #define LEFT_CLICK                  1
@@ -30,25 +31,27 @@ using UIStylePrimitive = std::variant<float, int, uint8, string, Color>;
 
 using UIStyleBlock = unordered_map<UIStyleProperty, UIStylePrimitive>;
 
+/*
+ * Test
+ * UIStyleBlock DefaultUIStyles = {
+ *     {UIStyleProperty::BACKGROUND_COLOR, Color{100, 100, 100}}
+ * };
+*/
+
 class UIComponent {
     public:
         UIComponent();
+        virtual ~UIComponent() = default;
 
-        Rec2                            bounds;
-        UIComponentState                state = NORMAL;
-        UIComponent*                    parent;
-        vector<UIComponent*>            children;
-        // vvector<std::shared_ptr<UIComponent>>   children;
-        // The code above is to change the old
-        // manual memory management ti smart pointers
-        // The main vector of children is children
-        // with the main shared_ptr and any other
-        // vector of specific types of components
-        // will use weak_ptr to be able to just delete
-        // any component and not worry about having
-        // obsolete pointers in other vectors which would
-        // cause undefined behaviour or segmentation
-        // faults.
+        bool                                    isDirty = false;
+        Rec2                                    bounds;
+        Vec2<float>                             cacheGlobalPos;
+
+        UIComponentState                        state = NORMAL;
+        UIComponent*                            parent;
+        vector<std::unique_ptr<UIComponent>>    children;
+
+        UIStyleBlock                            styles;
 
         /*
         virtual void layout() = 0;
@@ -63,7 +66,6 @@ class UIFrameComponent : public UIComponent {
     public:
         UIFrameComponent();
 
-        SDL_FRect                       boundingBox;
         SDL_Color                       bg;
 };
 
@@ -74,7 +76,6 @@ class UIButtonComponent : public UIComponent {
         string                          text;
         string                          prevText;
         string                          content;
-        SDL_FRect                       boundingBox;
         SDL_Color                       bg             = SDL_Color{100, 100, 100, SDL_ALPHA_OPAQUE};
         SDL_Color                       prevBg;
         bool                            hasBeenClicked = false;
@@ -91,15 +92,17 @@ class UIButtonComponent : public UIComponent {
             bg = prevBg;
         };
         virtual void onRightClick() {
-            SDL_Log("ASd");
+            // SDL_Log("ASd, Right click!");
         }
-        virtual void onRightRelease() {}
+        virtual void onRightRelease() {
+            // SDL_Log("Rich click release");
+        }
         virtual void onHover() {
-            SDL_Log("Hovered... %s", text.c_str());
+            // SDL_Log("Hovered... %s", text.c_str());
         };
         virtual void onFocus() {};
         virtual void whileFocus() {
-            SDL_Log("On focus...%s", text.c_str());
+            // SDL_Log("On focus...%s", text.c_str());
         };
         virtual void onLostFocus() {};
 };

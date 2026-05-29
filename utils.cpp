@@ -5,19 +5,22 @@ UIFrame::UIFrame() {
     this->buttons = {};
 }
 
-UIFrame::~UIFrame() {
-}
-
 // TODO: To change, as it only allows button components, and rest of functionality
 // is based on that
 // Working/Thinking on what components to add, and what should each component
 // do. So... yeah
-void UIFrame::addComponent(UIComponent* component) {
-    components.emplace_back(component);
-    UIButtonComponent* button = static_cast<UIButtonComponent*>(component);
+void UIFrame::addComponent(std::unique_ptr<UIComponent> component) {
+    // Temporary sol., will be changed with the grid-tree checking thing
+    UIButtonComponent* button = static_cast<UIButtonComponent*>(component.get());
     if(button) {
-       buttons.emplace_back(button);
+        SDL_Log("Added button component to frame");
+        buttons.emplace_back(button);
+    } else {
+        SDL_Log("Added a non button component to frame");
     }
+
+    components.push_back(std::move(component));
+
 }
 
 inline int coordToIndex(const int& x, const int& y, const int& width, const int& height) {
@@ -50,7 +53,7 @@ void UIFrame::update() {
     }
 
     for(auto button = buttons.rbegin(); button != buttons.rend(); ++button) {
-        if(PointInFRect(&(*button)->boundingBox, mousePos)) {
+        if(PointInFRect(&(*button)->bounds, mousePos)) {
             (*button)->onHover();
             break;
         }
@@ -66,8 +69,8 @@ void UIFrame::handleEvent(const SDL_Event& e) {
             if(!button->hasBeenClicked) { continue; }
             // Enable just for draggable objects
             continue;
-            button->boundingBox.x += xrel;
-            button->boundingBox.y += yrel;
+            button->bounds.x += xrel;
+            button->bounds.y += yrel;
         }
     }
     if(e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -75,7 +78,7 @@ void UIFrame::handleEvent(const SDL_Event& e) {
         float bY = e.button.y;
         bool buttonClicked = false;
         for(auto button = buttons.rbegin(); button != buttons.rend(); ++button) {
-            if(PointInFRect(&(*button)->boundingBox, Vec2<float>{bX, bY})) {
+            if(PointInFRect(&(*button)->bounds, Vec2<float>{bX, bY})) {
                 buttonClicked = true;
                 if(inFocus.empty()) {
                     inFocus.emplace_back(*button);
@@ -129,11 +132,13 @@ void UIFrame::renderGrid(SDL_Renderer* _renderer) {
 
 void UIFrame::render(SDL_Renderer* _renderer) {
     renderGrid(_renderer);
+    // The way the rendering works will change
     for(auto& button: buttons) {
         SDL_SetRenderDrawColor(_renderer, button->bg.r, button->bg.g, button->bg.b, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(_renderer, &button->boundingBox);
+        SDL_FRect bounds = Rec2ToSDLFRect(button->bounds);
+        SDL_RenderFillRect(_renderer, &bounds);
         SDL_SetRenderDrawColor(_renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-        SDL_RenderDebugText(_renderer, button->boundingBox.x, button->boundingBox.y, button->text.c_str());
+        SDL_RenderDebugText(_renderer, button->bounds.x, button->bounds.y, button->text.c_str());
     }
     SDL_RenderDebugTextFormat(_renderer, 0, 0, "Mouse pos: x: %f, y: %f", mousePos.x, mousePos.y);
 }

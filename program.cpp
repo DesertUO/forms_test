@@ -39,15 +39,15 @@ void Program::run() {
     // uiFrame->addComponent(bg_comp);
 
     // Test buttons
-    UIButtonComponent* b1 = new UIButtonComponent();
+    auto b1 = std::make_unique<UIButtonComponent>();;
     b1->text = "ASd";
-    b1->boundingBox = SDL_FRect{ 200.0f, 100.0f, 100.0f, 100.0f};
-    uiFrame->addComponent(b1);
+    b1->bounds = Rec2{ 200.0f, 100.0f, 100.0f, 100.0f};
+    uiFrame->addComponent(std::move(b1));
 
-    UIButtonComponent* b2 = new UIButtonComponent();
+    auto b2 = std::make_unique<UIButtonComponent>();
     b2->text = "Testt";
-    b2->boundingBox = SDL_FRect{ 250.0f, 150.0f, 100.0f, 100.0f};
-    uiFrame->addComponent(b2);
+    b2->bounds = Rec2{ 250.0f, 150.0f, 100.0f, 100.0f};
+    uiFrame->addComponent(std::move(b2));
 
     while(isRunning) {
         SDL_Log("Tick: %d", ((counter % 20) + 1));

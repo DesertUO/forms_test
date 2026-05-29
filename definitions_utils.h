@@ -19,20 +19,22 @@ struct Vec2 {
 };
 
 struct Rec2 {
-    double                          x;
-    double                          y;
-    double                          w;
-    double                          h;
+    float                           x;
+    float                           y;
+    float                           w;
+    float                           h;
 };
 
 struct Color {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
+    unsigned char                   r;
+    unsigned char                   g;
+    unsigned char                   b;
 };
 
 using uint8 = unsigned char;
 
 struct Event {};
 
-bool PointInFRect(const SDL_FRect* rect, Vec2<float> pos);
+bool PointInFRect(const Rec2* rect, Vec2<float> pos);
+
+SDL_FRect Rec2ToSDLFRect(const Rec2& rec);
