@@ -13,10 +13,7 @@ void UIFrame::addComponent(std::unique_ptr<UIComponent> component) {
     // Temporary sol., will be changed with the grid-tree checking thing
     UIButtonComponent* button = static_cast<UIButtonComponent*>(component.get());
     if(button) {
-        SDL_Log("Added button component to frame");
         buttons.emplace_back(button);
-    } else {
-        SDL_Log("Added a non button component to frame");
     }
 
     components.push_back(std::move(component));
